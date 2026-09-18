@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secret Vault</title>
+
+    <style>
+        :root {
+            --bg: #f6f7f9;
+            --text: #1f293f;
+            --card-bg: #ffffff;
+            --border: #e6e7e9;
+            --primary: #4a6bff;
+            --primary-hover: #3b5bff;
+            --muted: #6b7280;
+            --success-bg: #f0fdf4;
+            --success-text: #166534;
+            --success-border: #d9f7e5;
+            --error-bg: #fef2f2;
+            --error-text: #b91c1c;
+            --error-border: #fee2e2;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #e5e7eb;
+            --card-bg: #1f2937;
+            --border: #374151;
+            --muted: #9ca3af;
+            --success-bg: #102f1c;
+            --success-text: #86efac;
+            --success-border: #1f7c3f;
+            --error-bg: #2b1515;
+            --error-text: #fca5a5;
+            --error-border: #7f1d1d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-container {
+            max-width: 640px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 6px 4px;
+            border-radius: 10px;
+        }
+
+        .logo:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        [data-theme="dark"] .logo:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .lock-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        [data-theme="dark"] .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        main {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 40px 20px 40px 20px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .lock-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(74, 107, 255, 0.08);
+            margin-bottom: 20px;
+        }
+
+        [data-theme="dark"] .lock-circle {
+            background: rgba(74, 107, 255, 0.12);
+        }
+
+        .lock-circle svg {
+            width: 28px;
+            height: 28px;
+            color: var(--primary);
+        }
+
+        h2 {
+            font-size: clamp(20px, 4vw, 24px);
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 8px;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .w-md {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .w-lg {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.08);
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        .char-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .char-count.warn {
+            color: #dc2626;
+        }
+
+        .eye-btn {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .eye-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] .eye-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .eye-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .mt-2 {
+            margin-top: 8px;
+        }
+
+        .mt-3 {
+            margin-top: 12px;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+
+        .mt-5 {
+            margin-top: 20px;
+        }
+
+        .mt-6 {
+            margin-top: 24px;
+        }
+
+        .mt-8 {
+            margin-top: 32px;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .mb-3 {
+            margin-bottom: 12px;
+        }
+
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .between {
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .center-flex {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+
+        .gap-3 {
+            gap: 12px;
+        }
+
+        .wrap {
+            flex-wrap: wrap;
+        }
+
+        .link {
+            font-size: 13px;
+            color: var(--primary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+        }
+
+        .link:hover {
+            background: rgba(74, 107, 255, 0.08);
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tiny {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .alert {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 10px;
+            border: 1px solid;
+            line-height: 1.5;
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border-color: var(--success-border);
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-color: var(--error-border);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .strength {
+            display: flex;
+            gap: 4px;
+        }
+
+        .bar {
+            height: 3px;
+            border-radius: 999px;
+            flex: 1;
+            background: var(--border);
+        }
+
+        .bar.weak {
+            background: #ef4444;
+        }
+
+        .bar.medium {
+            background: #f59e0b;
+        }
+
+        .bar.strong {
+            background: #22c55e;
+        }
+
+        .data-box {
+            min-height: 160px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            line-height: 1.8;
+            max-height: 60vh;
+            overflow: auto;
+        }
+
+        [data-theme="dark"] .data-box {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 480px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .secret-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .secret-card:hover {
+            border-color: rgba(74, 107, 255, 0.4);
+        }
+
+        .file-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(74, 107, 255, 0.08);
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .file-icon {
+            background: rgba(74, 107, 255, 0.12);
+        }
+
+        .file-icon svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary);
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .minw-0 {
+            min-width: 0;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 50;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal .card {
+            max-width: 320px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-container">
+            <button class="logo" id="btnHome">
+                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <h1>Secret Vault</h1>
+            </button>
+            <button class="icon-btn" id="btnTheme" aria-label="Toggle theme">
+                <svg class="icon" id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path
+                        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+                <svg class="icon hidden" id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div id="viewHome" class="view active center">
+            <div class="text-center center">
+                <div class="lock-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </div>
+                <h2>Secret Vault</h2>
+                <p class="subtitle">Your private data, locked behind your secret code.</p>
+            </div>
+
+            <div class="card w-md mt-8">
+                <label>Enter your secret code</label>
+                <div class="input-wrap">
+                    <input type="password" id="homeCode" placeholder="BIRTHDAY123" autocomplete="off"
+                        spellcheck="false" />
+                    <button class="eye-btn" id="toggleHome">
+                        <svg class="eye-icon" id="eyeHome" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <svg class="eye-icon hidden" id="eyeOffHome" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                            <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                            <path
+                                d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                            <path d="m2 2 20 20" />
+                        </svg>
+                    </button>
+                </div>
+                <button class="btn btn-primary w-full mt-4" id="btnUnlockHome">🔓 UNLOCK</button>
+                <div class="flex center-flex mt-4">
+                    <button class="btn btn-ghost" id="btnGoCreate">+ Create Secret</button>
+                </div>
+            </div>
+
+            <div class="card w-md mt-5 center text-center" id="emptyBox">
+                <p style="font-size: 14px; font-weight: 500; margin: 0">Your vault is empty</p>
+                <p class="muted mt-2" style="margin: 8px 0 0 0; max-width: 260px">
+                    Create your first secret and securely store your data.
+                </p>
+                <button class="btn btn-primary mt-4" id="btnGoCreate2">+ Create Secret</button>
+            </div>
+
+            <div class="mt-6 w-full" id="recentWrap">
+                <div class="flex between mb-3">
+                    <h3 style="font-size: 14px; font-weight: 500; margin: 0">Recent Secrets</h3>
+                </div>
+                <div class="grid" id="recentGrid"></div>
+            </div>
+        </div>
+
+        <div id="viewCreate" class="view">
+            <div class="w-lg">
+                <h2>CREATE NEW SECRET</h2>
+                <div class="card mt-5">
+                    <div>
+                        <label>Title <span class="muted">(Optional)</span></label>
+                        <input type="text" id="createTitle" placeholder="e.g. Birthday" autocomplete="off"
+                            spellcheck="false" />
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="flex between mb-2">
+                            <label style="margin: 0">Secret Code</label>
+                            <button class="link" id="btnGenerate">Generate</button>
+                        </div>
+                        <div class="input-wrap">
+                            <input type="password" id="createCode" placeholder="BIRTHDAY123" autocomplete="off"
+                                spellcheck="false" />
+                            <button class="eye-btn" id="toggleCreate1">
+                                <svg class="eye-icon" id="eyeC1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg class="eye-icon hidden" id="eyeOffC1" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                    <path
+                                        d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                    <path d="m2 2 20 20" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label>Confirm Secret Code</label>
+                        <div class="input-wrap">
+                            <input type="password" id="createCode2" placeholder="Re-enter secret code" autocomplete="off"
+                                spellcheck="false" />
+                            <button class="eye-btn" id="toggleCreate2">
+                                <svg class="eye-icon" id="eyeC2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg class="eye-icon hidden" id="eyeOffC2" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                    <path
+                                        d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                    <path d="m2 2 20 20" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="strength mt-2">
+                            <div class="bar" id="b1"></div>
+                            <div class="bar" id="b2"></div>
+                            <div class="bar" id="b3"></div>
+                        </div>
+                        <p class="tiny mt-2" id="strengthText">Secret code strength: —</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <label>Private Data</label>
+                        <textarea id="createData" maxlength="500000" placeholder="Write your private data here."></textarea>
+                        <div class="char-row">
+                            <span class="tiny">Maximum 500,000 characters</span>
+                            <span class="tiny" id="createCount">0 / 500000</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success mt-3 hidden" id="msgSuccess"></div>
+                    <div class="alert alert-error mt-3 hidden" id="msgError"></div>
+
+                    <button class="btn btn-primary w-full mt-4" id="btnSave">🔒 SAVE SECRET</button>
+                    <div class="flex center-flex mt-3">
+                        <button class="btn btn-ghost" id="btnCancelCreate">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewUnlock" class="view">
+            <div class="w-md" style="margin: 0 auto">
+                <h2 class="text-center">UNLOCK SECRET</h2>
+                <div class="card mt-5">
+                    <label>Secret Code</label>
+                    <div class="input-wrap">
+                        <input type="password" id="unlockCode" placeholder="Enter secret code" autocomplete="off"
+                            spellcheck="false" />
+                        <button class="eye-btn" id="toggleUnlock">
+                            <svg class="eye-icon" id="eyeU" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg class="eye-icon hidden" id="eyeOffU" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                <path
+                                    d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                <path d="m2 2 20 20" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="alert alert-error mt-3 hidden" id="unlockError"></div>
+                    <button class="btn btn-primary w-full mt-4" id="btnUnlock">🔓 UNLOCK</button>
+                    <div class="flex center-flex mt-3">
+                        <button class="btn btn-ghost" id="btnBack">Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewData" class="view">
+            <div class="w-lg">
+                <div class="flex between mb-4">
+                    <h2>🔐 SECRET FOUND</h2>
+                    <button class="btn btn-ghost" id="btnLock">🔒 Lock</button>
+                </div>
+                <div class="card">
+                    <div class="flex between mb-3">
+                        <p id="viewTitle" style="font-size: 14px; font-weight: 500; margin: 0; min-width: 0"
+                            class="truncate"></p>
+                        <span class="tiny" id="viewDate"></span>
+                    </div>
+                    <div class="data-box" id="viewContent"></div>
+                    <p class="tiny mt-2" id="viewCount"></p>
+                    <div class="flex wrap gap-2 mt-4">
+                        <button class="btn btn-ghost" id="btnCopy">📋 Copy</button>
+                        <button class="btn btn-ghost" id="btnEdit">✏️ Edit</button>
+                        <button class="btn btn-ghost" style="color: #dc2626" id="btnDelete">🗑 Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewEdit" class="view">
+            <div class="w-lg">
+                <h2>EDIT SECRET</h2>
+                <div class="card mt-5">
+                    <div>
+                        <label>Title <span class="muted">(Optional)</span></label>
+                        <input type="text" id="editTitle" placeholder="e.g. Birthday" autocomplete="off" />
+                    </div>
+                    <div class="mt-4">
+                        <label>Secret Code</label>
+                        <div class="input-wrap">
+                            <input type="password" id="editCode" placeholder="Enter secret code" autocomplete="off"
+                                spellcheck="false" />
+                            <button class="eye-btn" id="toggleEdit">
+                                <svg class="eye-icon" id="eyeE" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg class="eye-icon hidden" id="eyeOffE" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                    <path
+                                        d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                    <path d="m2 2 20 20" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="tiny mt-2">Enter your current secret code to save changes.</p>
+                    </div>
+                    <div class="mt-4">
+                        <label>Private Data</label>
+                        <textarea id="editData" maxlength="500000" placeholder="Write your private data here."></textarea>
+                        <div class="char-row">
+                            <span class="tiny">Maximum 500,000 characters</span>
+                            <span class="tiny" id="editCount">0 / 500000</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-error mt-3 hidden" id="editError"></div>
+                    <div class="alert alert-success mt-3 hidden" id="editSuccess"></div>
+                    <button class="btn btn-primary w-full mt-4" id="btnSaveEdit">Save Changes</button>
+                    <div class="flex center-flex mt-3">
+                        <button class="btn btn-ghost" id="btnCancelEdit">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="delModal">
+        <div class="card">
+            <h3 style="font-size: 15px; font-weight: 600; margin: 0">Delete this secret?</h3>
+            <p class="muted mt-2">This action cannot be undone.</p>
+            <div class="flex" style="justify-content: flex-end; gap: 8px; margin-top: 20px">
+                <button class="btn btn-ghost" id="delCancel">Cancel</button>
+                <button class="btn btn-danger" id="delConfirm">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_CHARS = 500000;
+        const views = ["viewHome", "viewCreate", "viewUnlock", "viewData", "viewEdit"];
+        function show(v) {
+            views.forEach((id) => document.getElementById(id).classList.remove("active"));
+            document.getElementById(v).classList.add("active");
+        }
+
+        const body = document.body;
+        const themeKey = "secretVaultTheme";
+        let theme = localStorage.getItem(themeKey) || "light";
+        function applyTheme() {
+            body.setAttribute("data-theme", theme);
+            document.getElementById("iconSun").classList.toggle("hidden", theme === "dark");
+            document.getElementById("iconMoon").classList.toggle("hidden", theme === "light");
+        }
+        document.getElementById("btnTheme").onclick = () => {
+            theme = theme === "light" ? "dark" : "light";
+            localStorage.setItem(themeKey, theme);
+            applyTheme();
+        };
+        applyTheme();
+
+        function normalize(c) {
+            return (c || "").trim().replace(/\s+/g, "");
+        }
+        function hashCode(s) {
+            const str = normalize(s);
+            let h = 0;
+            for (let i = 0; i < str.length; i++) {
+                h = (h << 5) - h + str.charCodeAt(i);
+                h |= 0;
+            }
+            return String(h);
+        }
+        function strength(s) {
+            const c = normalize(s);
+            let sc = 0;
+            if (c.length >= 8) sc++;
+            if (/[A-Z]/.test(c)) sc++;
+            if (/[0-9]/.test(c)) sc++;
+            if (/[^A-Za-z0-9]/.test(c)) sc++;
+            if (c.length >= 12) sc++;
+            if (sc <= 1) return "Weak";
+            if (sc === 2 || sc === 3) return "Medium";
+            return "Strong";
+        }
+        function genCode() {
+            const w = ["Alpha", "Blue", "Crimson", "Delta", "Falcon", "Nova", "Orbit", "River", "Storm", "Titan"];
+            const n = Math.floor(1000 + Math.random() * 9000);
+            return w[Math.floor(Math.random() * w.length)] + "-" + w[Math.floor(Math.random() * w.length)] + "-" + n;
+        }
+        function msg(el, ok, t) {
+            el.textContent = t;
+            el.classList.remove("hidden");
+            el.classList.remove("alert-success", "alert-error");
+            el.classList.add(ok ? "alert-success" : "alert-error");
+        }
+        function hideMsg(el) {
+            el.classList.add("hidden");
+        }
+        function formatCount(n) {
+            return n.toLocaleString() + " / " + MAX_CHARS.toLocaleString();
+        }
+        function updateCount(textarea, counter) {
+            const n = textarea.value.length;
+            counter.textContent = formatCount(n);
+            counter.classList.toggle("warn", n >= MAX_CHARS);
+        }
+
+        function pwToggle(input, eye, eyeOff) {
+            if (input.type === "password") {
+                input.type = "text";
+                eye.classList.add("hidden");
+                eyeOff.classList.remove("hidden");
+            } else {
+                input.type = "password";
+                eye.classList.remove("hidden");
+                eyeOff.classList.add("hidden");
+            }
+        }
+
+        const vaultKey = "secretVaultData";
+        function load() {
+            try {
+                const d = localStorage.getItem(vaultKey);
+                return d ? JSON.parse(d) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function save(a) {
+            localStorage.setItem(vaultKey, JSON.stringify(a));
+        }
+        function find(c) {
+            const h = hashCode(c);
+            return load().find((x) => x.hash === h) || null;
+        }
+
+        let current = null;
+        const createData = document.getElementById("createData");
+        const editData = document.getElementById("editData");
+        const createCount = document.getElementById("createCount");
+        const editCount = document.getElementById("editCount");
+
+        createData.addEventListener("input", () => updateCount(createData, createCount));
+        editData.addEventListener("input", () => updateCount(editData, editCount));
+
+        document.getElementById("btnHome").onclick = () => {
+            current = null;
+            render();
+            show("viewHome");
+        };
+        document.getElementById("btnGoCreate").onclick = () => show("viewCreate");
+        document.getElementById("btnGoCreate2").onclick = () => show("viewCreate");
+        document.getElementById("btnCancelCreate").onclick = () => show("viewHome");
+        document.getElementById("btnBack").onclick = () => show("viewHome");
+        document.getElementById("btnLock").onclick = () => {
+            current = null;
+            show("viewHome");
+        };
+
+        document.getElementById("toggleHome").onclick = () => pwToggle(document.getElementById("homeCode"), document.getElementById("eyeHome"), document.getElementById("eyeOffHome"));
+        document.getElementById("toggleUnlock").onclick = () => pwToggle(document.getElementById("unlockCode"), document.getElementById("eyeU"), document.getElementById("eyeOffU"));
+        document.getElementById("toggleCreate1").onclick = () => pwToggle(document.getElementById("createCode"), document.getElementById("eyeC1"), document.getElementById("eyeOffC1"));
+        document.getElementById("toggleCreate2").onclick = () => pwToggle(document.getElementById("createCode2"), document.getElementById("eyeC2"), document.getElementById("eyeOffC2"));
+        document.getElementById("toggleEdit").onclick = () => pwToggle(document.getElementById("editCode"), document.getElementById("eyeE"), document.getElementById("eyeOffE"));
+
+        const cCode = document.getElementById("createCode");
+        const b1 = document.getElementById("b1"),
+            b2 = document.getElementById("b2"),
+            b3 = document.getElementById("b3");
+        const sText = document.getElementById("strengthText");
+        cCode.oninput = () => {
+            const st = strength(cCode.value);
+            sText.textContent = "Secret code strength: " + st;
+            b1.className = "bar" + (st !== "Weak" ? " " + st.toLowerCase() : "");
+            b2.className = "bar" + (st === "Strong" ? " strong" : "");
+            b3.className = "bar" + (st === "Strong" ? " strong" : "");
+        };
+        document.getElementById("btnGenerate").onclick = () => {
+            const g = genCode();
+            cCode.value = g;
+            document.getElementById("createCode2").value = g;
+            cCode.dispatchEvent(new Event("input"));
+        };
+
+        function render() {
+            const v = load();
+            const grid = document.getElementById("recentGrid");
+            const wrap = document.getElementById("recentWrap");
+            const empty = document.getElementById("emptyBox");
+            grid.innerHTML = "";
+            if (v.length === 0) {
+                wrap.style.display = "none";
+                empty.style.display = "flex";
+                return;
+            }
+            empty.style.display = "none";
+            wrap.style.display = "block";
+            v.slice().reverse().forEach((s) => {
+                const d = document.createElement("div");
+                d.className = "secret-card";
+                d.innerHTML = '<div class="flex gap-3 minw-0"><div class="file-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="minw-0"><p style="font-size:14px;font-weight:500;margin:0;line-height:1.3" class="truncate">' + (s.title || "Untitled") + '</p><p class="tiny truncate">••••••••</p></div></div><button class="btn btn-ghost" style="padding:6px 10px;font-size:13px">Open</button>';
+                d.onclick = () => {
+                    document.getElementById("unlockCode").value = "";
+                    hideMsg(document.getElementById("unlockError"));
+                    show("viewUnlock");
+                };
+                grid.appendChild(d);
+            });
+        }
+
+        function openSecret(r, code) {
+            current = { rec: r, code };
+            document.getElementById("viewTitle").textContent = r.title || "Untitled";
+            document.getElementById("viewContent").textContent = r.data;
+            document.getElementById("viewDate").textContent = r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "";
+            document.getElementById("viewCount").textContent = (r.data || "").length.toLocaleString() + " characters";
+            show("viewData");
+        }
+
+        document.getElementById("btnUnlockHome").onclick = () => {
+            const code = document.getElementById("homeCode").value;
+            if (!normalize(code)) {
+                alert("Please enter your secret code");
+                return;
+            }
+            const r = find(code);
+            if (!r) {
+                alert("Invalid secret code or unavailable secret.");
+                return;
+            }
+            openSecret(r, code);
+        };
+
+        document.getElementById("btnUnlock").onclick = () => {
+            const code = document.getElementById("unlockCode").value;
+            const err = document.getElementById("unlockError");
+            hideMsg(err);
+            const r = find(code);
+            if (!r) {
+                msg(err, false, "Invalid secret code or unavailable secret.");
+                return;
+            }
+            openSecret(r, code);
+        };
+
+        document.getElementById("btnSave").onclick = () => {
+            const title = document.getElementById("createTitle").value.trim();
+            const code = document.getElementById("createCode").value;
+            const code2 = document.getElementById("createCode2").value;
+            const data = document.getElementById("createData").value;
+            const e = document.getElementById("msgError");
+            const s = document.getElementById("msgSuccess");
+            hideMsg(e);
+            hideMsg(s);
+            const nc = normalize(code);
+            if (!nc) {
+                msg(e, false, "Secret code cannot be empty.");
+                return;
+            }
+            if (nc !== normalize(code2)) {
+                msg(e, false, "Confirmation must match.");
+                return;
+            }
+            if (!data.trim()) {
+                msg(e, false, "Data cannot be empty.");
+                return;
+            }
+            if (data.length > MAX_CHARS) {
+                msg(e, false, "Data cannot exceed 500,000 characters.");
+                return;
+            }
+            if (find(code)) {
+                msg(e, false, "A secret using this code already exists. Use a different code or edit the existing secret.");
+                return;
+            }
+            const v = load();
+            v.push({ hash: hashCode(code), title: title || "", data: data, createdAt: new Date().toISOString() });
+            try {
+                save(v);
+            } catch (err) {
+                msg(e, false, "Could not save. Browser storage is full. Try a shorter note.");
+                return;
+            }
+            msg(s, true, "✓ Secret saved successfully");
+            document.getElementById("createTitle").value = "";
+            document.getElementById("createCode").value = "";
+            document.getElementById("createCode2").value = "";
+            document.getElementById("createData").value = "";
+            updateCount(createData, createCount);
+            b1.className = "bar";
+            b2.className = "bar";
+            b3.className = "bar";
+            sText.textContent = "Secret code strength: —";
+            render();
+            setTimeout(() => show("viewHome"), 1200);
+        };
+
+        document.getElementById("btnCopy").onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(document.getElementById("viewContent").textContent);
+                const b = document.getElementById("btnCopy");
+                const old = b.innerHTML;
+                b.innerHTML = "✓ Copied";
+                setTimeout(() => (b.innerHTML = old), 1400);
+            } catch (e) { }
+        };
+
+        document.getElementById("btnEdit").onclick = () => {
+            if (!current) return;
+            document.getElementById("editTitle").value = current.rec.title || "";
+            document.getElementById("editData").value = current.rec.data;
+            document.getElementById("editCode").value = "";
+            updateCount(editData, editCount);
+            hideMsg(document.getElementById("editError"));
+            hideMsg(document.getElementById("editSuccess"));
+            show("viewEdit");
+        };
+        document.getElementById("btnCancelEdit").onclick = () => show("viewData");
+        document.getElementById("btnSaveEdit").onclick = () => {
+            if (!current) return;
+            const title = document.getElementById("editTitle").value.trim();
+            const code = document.getElementById("editCode").value;
+            const data = document.getElementById("editData").value;
+            const e = document.getElementById("editError"),
+                s = document.getElementById("editSuccess");
+            hideMsg(e);
+            hideMsg(s);
+            if (hashCode(code) !== current.rec.hash) {
+                msg(e, false, "Invalid secret code or unavailable secret.");
+                return;
+            }
+            if (!data.trim()) {
+                msg(e, false, "Data cannot be empty.");
+                return;
+            }
+            if (data.length > MAX_CHARS) {
+                msg(e, false, "Data cannot exceed 500,000 characters.");
+                return;
+            }
+            const v = load();
+            const i = v.findIndex((x) => x.hash === current.rec.hash);
+            if (i !== -1) {
+                v[i].title = title || "";
+                v[i].data = data;
+                try {
+                    save(v);
+                } catch (err) {
+                    msg(e, false, "Could not save. Browser storage is full. Try a shorter note.");
+                    return;
+                }
+                current.rec = v[i];
+            }
+            document.getElementById("viewTitle").textContent = title || "Untitled";
+            document.getElementById("viewContent").textContent = data;
+            document.getElementById("viewCount").textContent = data.length.toLocaleString() + " characters";
+            msg(s, true, "✓ Updated");
+            setTimeout(() => show("viewData"), 1000);
+        };
+
+        document.getElementById("btnDelete").onclick = () => document.getElementById("delModal").classList.add("active");
+        document.getElementById("delCancel").onclick = () => document.getElementById("delModal").classList.remove("active");
+        document.getElementById("delConfirm").onclick = () => {
+            if (!current) return;
+            let v = load();
+            v = v.filter((x) => x.hash !== current.rec.hash);
+            save(v);
+            current = null;
+            document.getElementById("delModal").classList.remove("active");
+            render();
+            show("viewHome");
+        };
+
+        render();
+        updateCount(createData, createCount);
+    </script>
+</body>
+
+</html>
